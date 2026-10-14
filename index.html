@@ -1,414 +1,304 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Pembelajaran Interaktif: Jual Beli</title>
-    <!-- Google Fonts & Tailwind CSS -->
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Media Pembelajaran Interaktif: Jual Beli</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-pink flex flex-col h-screen overflow-hidden font-['Quicksand'] select-none">
+<body class="theme-pink">
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <!-- Language Notification Toast -->
-    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] px-4 py-2 bg-gray-900/90 backdrop-blur-md text-white text-xs font-bold rounded-full shadow-lg transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-2">
-        Bahasa diubah
+<!-- Objek 3D melayang di sisi kiri & kanan (tampil di layar lebar > 1260px) -->
+<div id="gutters" class="gutters" aria-hidden="true">
+  <span class="obj g1" data-o="coin" title="Koin"></span>
+  <span class="obj g2" data-o="strawberry" title="Stroberi"></span>
+  <span class="obj g3" data-o="grapes" title="Anggur"></span>
+  <span class="obj g4" data-o="cash" title="Uang Kertas"></span>
+</div>
+
+<header>
+  <div class="brand"><span class="em" aria-hidden="true">🛒</span>
+    <div><h1 data-i18n="nav_title">Jual Beli • Kelas VII Fase D</h1><small class="hide-sm" data-i18n="nav_subtitle">Pendidikan Khusus (Tunarungu)</small></div>
+  </div>
+  <div class="row">
+    <details class="tools"><summary class="btn ghost">🎨 <span class="hide-sm" data-i18n="tools_label">Tampilan</span></summary>
+      <div class="pop">
+        <p data-i18n="nav_theme">Tema:</p>
+        <div class="swatches" id="swatches"></div>
+        <button class="btn ghost" id="text-btn" type="button" onclick="cycleText()">Aa</button>
+      </div>
+    </details>
+    <button class="btn ghost" id="lang-btn" type="button" onclick="toggleLang()" title="Ganti Bahasa / Switch Language">🇮🇩 ID / 🇬🇧 EN</button>
+  </div>
+  <div class="bar"><i id="bar"></i></div>
+</header>
+
+<main>
+<!-- 1 Cover -->
+<section class="slide cover active" aria-labelledby="t1">
+  <div class="cover-text">
+    <span class="chip" data-i18n="s1_badge">KURIKULUM MERDEKA • FASE D</span>
+    <h2 id="t1" tabindex="-1" data-i18n="s1_title">Mengenal Kegiatan <span class="hl">Jual Beli</span></h2>
+    <p data-i18n="s1_subtitle">Khusus Peserta Didik Hambatan Pendengaran (Tunarungu)</p>
+    <button class="btn big" type="button" onclick="nextSlide()">▶ <span data-i18n="btn_start">Mulai Belajar</span></button>
+    <details class="credits"><summary data-i18n="s1_authors_title">Penyusun (Kelompok 1 - UNESA):</summary>
+      <ul>
+        <li>Amelia Puspita Sari (250100106)</li><li>Fania Ardinda Rizka (25010044157)</li>
+        <li>Nadine Lury Qotrunada (25010044010)</li><li>Nadia Havilah (25010044017)</li>
+        <li>Nayla Averyl Prasetyo (250100060)</li>
+      </ul>
+      <p><b data-i18n="s1_lecturer_title">Dosen Pengampu:</b> Danis Ade Dwirisnanda, S.Pd., M.Hum. · Devina Rahmadiani Kamaruddin Nur, S.Pd., M.Pd.</p>
+    </details>
+  </div>
+
+  <!-- Stan Toko Buah 3D dengan penjual & buah-buah interaktif -->
+  <div class="stall" aria-label="Stan Buah Interaktif 3D" role="img">
+    <div class="persp">
+      <div class="scene">
+        <div class="st-ground"></div>
+        <div class="st-back"></div>
+        <div class="st-shelf"></div>
+        <div class="st-shelfitems">
+          <div class="grp"><span class="obj" data-o="pear" style="--s:5.6cqw" title="Pir"></span><span class="obj" data-o="orange" style="--s:5.4cqw" title="Jeruk"></span></div>
+          <div class="grp"><span class="obj" data-o="banana" style="--s:6.4cqw" title="Pisang"></span><span class="obj" data-o="grapes" style="--s:5.6cqw" title="Anggur"></span></div>
+        </div>
+        <!-- Penjual ramah di stan -->
+        <div class="seller">
+          <div class="s-head">
+            <div class="s-hair"></div>
+            <div class="s-cap"></div>
+            <div class="s-eye l"></div><div class="s-eye r"></div>
+            <div class="s-cheek l"></div><div class="s-cheek r"></div>
+            <div class="s-mouth"></div>
+          </div>
+          <div class="s-body"><div class="s-apron"></div></div>
+          <div class="s-arm" title="Lambaian Penjual"></div>
+        </div>
+        <!-- Meja kasir & display buah -->
+        <div class="st-top"></div>
+        <div class="st-counter">
+          <div class="st-board">🍎 KIOS BUAH SEGAR 🍊<br><small style="font-size:.58em;opacity:.9">✨ Klik Buah / Uang ✨</small></div>
+        </div>
+        <div class="st-pole l"></div><div class="st-pole r"></div>
+        <div class="st-crate l"></div>
+        <div class="st-fruits l">
+          <span class="obj" data-o="apple" style="--s:7.6cqw" title="Apel"></span>
+          <span class="obj" data-o="orange" style="--s:7.2cqw" title="Jeruk"></span>
+          <span class="obj" data-o="strawberry" style="--s:6.8cqw" title="Stroberi"></span>
+        </div>
+        <div class="st-crate r"></div>
+        <div class="st-fruits r">
+          <span class="obj" data-o="banana" style="--s:8.2cqw" title="Pisang"></span>
+          <span class="obj" data-o="melon" style="--s:8.4cqw" title="Semangka"></span>
+        </div>
+        <div class="st-mid">
+          <span class="obj" data-o="cash" style="--s:6.8cqw" title="Uang Kertas"></span>
+          <span class="obj" data-o="coin" style="--s:5.8cqw" title="Koin"></span>
+        </div>
+        <div class="st-awning"></div>
+        <div class="st-sign">🛒 STAN JUAL BELI</div>
+        <div class="st-fly f1"><span class="obj" data-o="apple" style="--s:7cqw" title="Apel"></span></div>
+        <div class="st-fly f2"><span class="obj" data-o="coin" style="--s:6cqw" title="Koin"></span></div>
+      </div>
     </div>
+  </div>
+</section>
 
-    <!-- Top Navigation Bar & Customizer -->
-    <header class="flex justify-between items-center px-6 py-3 bg-white/70 backdrop-blur-md shadow-xs z-50 border-b border-white/40">
-        <div class="flex items-center gap-3">
-            <span class="text-2xl">🛒</span>
-            <div>
-                <h1 class="font-bold text-gray-800 text-base leading-tight" data-i18n="nav_title">Jual Beli • Kelas VII Fase D</h1>
-                <p class="text-xs text-gray-500" data-i18n="nav_subtitle">Pendidikan Khusus (Tunarungu)</p>
-            </div>
-        </div>
+<!-- 2 Tujuan -->
+<section class="slide edged" aria-labelledby="t2">
+  <h2 id="t2" tabindex="-1"><span class="em" aria-hidden="true">🎯</span><span data-i18n="s2_title">Tujuan Pembelajaran</span></h2>
+  <p data-i18n="s2_desc">Setelah mempelajari materi ini, anak diharapkan dapat:</p>
+  <div class="grid">
+    <div class="panel goal"><b class="num">1</b><div><h3 data-i18n="s2_goal1_title">Arti Jual Beli</h3><p data-i18n="s2_goal1_desc"></p></div></div>
+    <div class="panel goal"><b class="num">2</b><div><h3 data-i18n="s2_goal2_title">Mengenali Komponen</h3><p data-i18n="s2_goal2_desc"></p></div></div>
+    <div class="panel goal"><b class="num">3</b><div><h3 data-i18n="s2_goal3_title">Langkah Transaksi</h3><p data-i18n="s2_goal3_desc"></p></div></div>
+    <div class="panel goal"><b class="num">4</b><div><h3 data-i18n="s2_goal4_title">Praktik Bertanggung Jawab</h3><p data-i18n="s2_goal4_desc"></p></div></div>
+  </div>
+  <!-- Rak visual benda jual beli 3D (bisa dipencet & squeeze) -->
+  <div class="deco shelf" data-opt aria-label="Benda Jual Beli Interaktif">
+    <span class="obj" data-o="apple" style="--s:68px" title="Apel (Bisa Dipencet!)"></span>
+    <span class="obj" data-o="orange" style="--s:64px" title="Jeruk"></span>
+    <span class="obj" data-o="coin" style="--s:58px" title="Koin"></span>
+    <span class="obj" data-o="cash" style="--s:72px" title="Uang Kertas"></span>
+    <span class="obj" data-o="bag" style="--s:74px" title="Tas Belanja"></span>
+  </div>
+</section>
 
-        <!-- Theme Switcher (Pastel Colors) -->
-        <div class="flex items-center gap-2 bg-gray-100/80 p-1.5 rounded-full shadow-inner">
-            <span class="text-xs font-semibold text-gray-600 px-2 hidden sm:inline" data-i18n="nav_theme">Tema:</span>
-            <button onclick="setTheme('red')" class="w-6 h-6 rounded-full bg-rose-300 hover:scale-110 transition cursor-pointer border-2 border-white shadow-xs" title="Merah Pastel"></button>
-            <button onclick="setTheme('orange')" class="w-6 h-6 rounded-full bg-amber-300 hover:scale-110 transition cursor-pointer border-2 border-white shadow-xs" title="Jingga Pastel"></button>
-            <button onclick="setTheme('yellow')" class="w-6 h-6 rounded-full bg-yellow-200 hover:scale-110 transition cursor-pointer border-2 border-white shadow-xs" title="Kuning Pastel"></button>
-            <button onclick="setTheme('green')" class="w-6 h-6 rounded-full bg-emerald-300 hover:scale-110 transition cursor-pointer border-2 border-white shadow-xs" title="Hijau Pastel"></button>
-            <button onclick="setTheme('blue')" class="w-6 h-6 rounded-full bg-sky-300 hover:scale-110 transition cursor-pointer border-2 border-white shadow-xs" title="Biru Pastel"></button>
-            <button onclick="setTheme('purple')" class="w-6 h-6 rounded-full bg-purple-300 hover:scale-110 transition cursor-pointer border-2 border-white shadow-xs" title="Ungu Pastel"></button>
-            <button onclick="setTheme('pink')" class="w-6 h-6 rounded-full bg-pink-300 hover:scale-110 transition cursor-pointer border-2 border-white shadow-xs" title="Pink Pastel"></button>
-        </div>
-
-        <!-- Slide Review Modal Trigger & Language Toggle -->
-        <div class="flex items-center gap-3">
-            <button onclick="toggleLang()" id="lang-btn" class="px-3.5 py-1.5 text-xs font-bold bg-white text-gray-700 rounded-full shadow-xs hover:bg-gray-50 border border-gray-200 transition cursor-pointer flex items-center gap-1.5" title="Ganti Bahasa / Switch Language">
-                🇮🇩 ID / 🇬🇧 EN
-            </button>
-            <button onclick="openOverview()" class="px-4 py-1.5 text-xs font-bold text-white bg-indigo-500 hover:bg-indigo-600 rounded-full shadow-md transition cursor-pointer flex items-center gap-1.5">
-                <span>📑</span> <span data-i18n="nav_review">Review Slide</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Main Presentation Container -->
-    <main class="flex-1 relative overflow-hidden flex items-center justify-center p-4 md:p-8">
-        
-        <!-- Slide 1: Cover -->
-        <div class="slide active flex flex-col md:flex-row items-center justify-between w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-xl border border-white">
-            <div class="flex-1 space-y-4">
-                <span class="inline-block px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold tracking-wide" data-i18n="s1_badge">KURIKULUM MERDEKA • FASE D</span>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-800 leading-tight" data-i18n="s1_title">Mengenal Kegiatan <span class="text-pink-500">Jual Beli</span></h2>
-                <p class="text-gray-600 text-sm md:text-base font-medium" data-i18n="s1_subtitle">Khusus Peserta Didik Hambatan Pendengaran (Tunarungu)</p>
-                <div class="pt-4 border-t border-gray-100 text-xs text-gray-600 space-y-1">
-                    <p class="font-bold text-gray-800" data-i18n="s1_authors_title">Penyusun (Kelompok 1 - UNESA):</p>
-                    <div class="grid grid-cols-2 gap-1 text-[11px]">
-                        <p>• Amelia Puspita Sari (250100106)</p>
-                        <p>• Fania Ardinda Rizka (25010044157)</p>
-                        <p>• Nadine Lury Qotrunada (25010044010)</p>
-                        <p>• Nadia Havilah (25010044017)</p>
-                        <p>• Nayla Averyl Prasetyo (250100060)</p>
-                    </div>
-                </div>
-                <div class="pt-2 text-[11px] text-gray-500">
-                    <p class="font-semibold text-gray-700" data-i18n="s1_lecturer_title">Dosen Pengampu:</p>
-                    <p>Danis Ade Dwirisnanda, S.Pd., M.Hum. | Devina Rahmadiani Kamaruddin Nur, S.Pd., M.Pd.</p>
-                </div>
-            </div>
-            <div class="w-full md:w-2/5 flex justify-center items-center mt-6 md:mt-0">
-                <div class="relative w-64 h-64 bg-gradient-to-tr from-pink-200 to-purple-200 rounded-3xl flex items-center justify-center shadow-inner animate-pulse">
-                    <span class="text-8xl drop-shadow-lg">🛍️</span>
-                    <div class="absolute -bottom-3 -right-3 bg-white px-4 py-2 rounded-2xl shadow-md text-xs font-bold text-gray-700 border border-gray-100" data-i18n="s1_badge_3d">
-                        ✨ 3D Interactive
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 2: Tujuan Pembelajaran -->
-        <div class="slide flex flex-col justify-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-xl border border-white">
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-6 flex items-center gap-3">
-                <span class="p-2 bg-amber-100 rounded-2xl text-2xl">🎯</span> <span data-i18n="s2_title">Tujuan Pembelajaran</span>
-            </h2>
-            <p class="text-gray-600 text-sm mb-6" data-i18n="s2_desc">Setelah mempelajari materi ini, anak diharapkan dapat:</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/80 border border-gray-100 shadow-xs hover:bg-white transition">
-                    <span class="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center font-bold text-sm shrink-0">1</span>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s2_goal1_title">Arti Jual Beli</h3>
-                        <p class="text-xs text-gray-600 mt-1" data-i18n="s2_goal1_desc">Menjelaskan arti jual beli baik menggunakan bahasa isyarat maupun tulisan.</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/80 border border-gray-100 shadow-xs hover:bg-white transition">
-                    <span class="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center font-bold text-sm shrink-0">2</span>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s2_goal2_title">Mengenali Komponen</h3>
-                        <p class="text-xs text-gray-600 mt-1" data-i18n="s2_goal2_desc">Mengenali penjual, pembeli, barang, dan harga dengan tepat.</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/80 border border-gray-100 shadow-xs hover:bg-white transition">
-                    <span class="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center font-bold text-sm shrink-0">3</span>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s2_goal3_title">Langkah Transaksi</h3>
-                        <p class="text-xs text-gray-600 mt-1" data-i18n="s2_goal3_desc">Mengurutkan langkah-langkah bertransaksi secara mandiri.</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/80 border border-gray-100 shadow-xs hover:bg-white transition">
-                    <span class="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center font-bold text-sm shrink-0">4</span>
-                    <div>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s2_goal4_title">Praktik Bertanggung Jawab</h3>
-                        <p class="text-xs text-gray-600 mt-1" data-i18n="s2_goal4_desc">Mempraktikkan secara jujur, sopan, dan bertanggung jawab.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 3: Pengertian & Kriteria -->
-        <div class="slide flex flex-col justify-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-xl border border-white">
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-4 flex items-center gap-3">
-                <span class="p-2 bg-blue-100 rounded-2xl text-2xl">💡</span> <span data-i18n="s3_title">Apa itu Jual Beli?</span>
-            </h2>
-            <p class="text-gray-700 text-base mb-6 bg-pink-50/60 p-4 rounded-2xl border border-pink-100 font-medium" data-i18n="s3_desc">
-                Jual beli adalah kegiatan menukar barang atau jasa dengan uang berdasarkan kesepakatan. Transaksi hanya terjadi apabila kedua pihak sudah sepakat.
-            </p>
-            <p class="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider" data-i18n="s3_req_title">Syarat wajib dalam jual beli (Klik pop-up di bawah):</p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div onclick="openPopupKey('seller')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition cursor-pointer text-center group">
-                    <span class="text-4xl block mb-2 group-hover:scale-125 transition">🧑‍💼</span>
-                    <h3 class="font-bold text-gray-800 text-sm" data-i18n="s3_card1_title">1. Penjual</h3>
-                    <p class="text-[10px] text-gray-400 mt-1" data-i18n="s3_card1_sub">Klik untuk detail</p>
-                </div>
-                <div onclick="openPopupKey('goods')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition cursor-pointer text-center group">
-                    <span class="text-4xl block mb-2 group-hover:scale-125 transition">🧸</span>
-                    <h3 class="font-bold text-gray-800 text-sm" data-i18n="s3_card2_title">2. Barang</h3>
-                    <p class="text-[10px] text-gray-400 mt-1" data-i18n="s3_card2_sub">Klik untuk detail</p>
-                </div>
-                <div onclick="openPopupKey('payment_tool')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition cursor-pointer text-center group">
-                    <span class="text-4xl block mb-2 group-hover:scale-125 transition">💵</span>
-                    <h3 class="font-bold text-gray-800 text-sm" data-i18n="s3_card3_title">3. Alat Transaksi</h3>
-                    <p class="text-[10px] text-gray-400 mt-1" data-i18n="s3_card3_sub">Klik untuk detail</p>
-                </div>
-                <div onclick="openPopupKey('buyer')" class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:scale-105 transition cursor-pointer text-center group">
-                    <span class="text-4xl block mb-2 group-hover:scale-125 transition">🛒</span>
-                    <h3 class="font-bold text-gray-800 text-sm" data-i18n="s3_card4_title">4. Pembeli</h3>
-                    <p class="text-[10px] text-gray-400 mt-1" data-i18n="s3_card4_sub">Klik untuk detail</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 4: Peran Penjual & Pembeli -->
-        <div class="slide flex flex-col justify-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-xl border border-white">
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-6 flex items-center gap-3">
-                <span class="p-2 bg-emerald-100 rounded-2xl text-2xl">🤝</span> <span data-i18n="s4_title">Peran Penjual dan Pembeli</span>
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-3xl">🧑‍🍳</span>
-                        <h3 class="font-bold text-gray-800 text-lg" data-i18n="s4_seller_title">Peran Penjual</h3>
-                    </div>
-                    <ul class="space-y-3 text-sm text-gray-600">
-                        <li class="flex items-center gap-2" data-i18n="s4_seller_1">✅ Menyediakan barang atau jasa</li>
-                        <li class="flex items-center gap-2" data-i18n="s4_seller_2">✅ Menjelaskan harga dan kondisi barang</li>
-                        <li class="flex items-center gap-2" data-i18n="s4_seller_3">✅ Menerima pembayaran sesuai kesepakatan</li>
-                    </ul>
-                </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-3xl">🛍️</span>
-                        <h3 class="font-bold text-gray-800 text-lg" data-i18n="s4_buyer_title">Peran Pembeli</h3>
-                    </div>
-                    <ul class="space-y-3 text-sm text-gray-600">
-                        <li class="flex items-center gap-2" data-i18n="s4_buyer_1">✅ Memilih barang atau jasa</li>
-                        <li class="flex items-center gap-2" data-i18n="s4_buyer_2">✅ Bertanya jika belum paham</li>
-                        <li class="flex items-center gap-2" data-i18n="s4_buyer_3">✅ Membayar sesuai kesepakatan</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 5: Langkah-Langkah Jual Beli -->
-        <div class="slide flex flex-col justify-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-xl border border-white">
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-6 flex items-center gap-3">
-                <span class="p-2 bg-purple-100 rounded-2xl text-2xl">⚡</span> <span data-i18n="s5_title">Alur Langkah Jual Beli</span>
-            </h2>
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center flex flex-col justify-between">
-                    <div>
-                        <span class="text-2xl block mb-2">🔍</span>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s5_step1_h">1. Pilih</h3>
-                        <p class="text-[11px] text-gray-500 mt-1" data-i18n="s5_step1_p">Memilih barang yang dibutuhkan.</p>
-                    </div>
-                    <span class="text-[10px] bg-pink-50 text-pink-600 py-1 rounded-lg font-bold mt-3" data-i18n="s5_step1_b">Langkah Awal</span>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center flex flex-col justify-between">
-                    <div>
-                        <span class="text-2xl block mb-2">🏷️</span>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s5_step2_h">2. Periksa</h3>
-                        <p class="text-[11px] text-gray-500 mt-1" data-i18n="s5_step2_p">Melihat kondisi dan harga barang.</p>
-                    </div>
-                    <span class="text-[10px] bg-pink-50 text-pink-600 py-1 rounded-lg font-bold mt-3" data-i18n="s5_step2_b">Cek Kualitas</span>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center flex flex-col justify-between">
-                    <div>
-                        <span class="text-2xl block mb-2">🤝</span>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s5_step3_h">3. Sepakati</h3>
-                        <p class="text-[11px] text-gray-500 mt-1" data-i18n="s5_step3_p">Menyetujui harga bersama penjual.</p>
-                    </div>
-                    <span class="text-[10px] bg-pink-50 text-pink-600 py-1 rounded-lg font-bold mt-3" data-i18n="s5_step3_b">Deal Harga</span>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center flex flex-col justify-between">
-                    <div>
-                        <span class="text-2xl block mb-2">💳</span>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s5_step4_h">4. Bayar</h3>
-                        <p class="text-[11px] text-gray-500 mt-1" data-i18n="s5_step4_p">Membayar sesuai harga barang.</p>
-                    </div>
-                    <span class="text-[10px] bg-pink-50 text-pink-600 py-1 rounded-lg font-bold mt-3" data-i18n="s5_step4_b">Transaksi</span>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 text-center flex flex-col justify-between col-span-2 md:col-span-1">
-                    <div>
-                        <span class="text-2xl block mb-2">✅</span>
-                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s5_step5_h">5. Cek Kembali</h3>
-                        <p class="text-[11px] text-gray-500 mt-1" data-i18n="s5_step5_p">Menerima dan memeriksa barang.</p>
-                    </div>
-                    <span class="text-[10px] bg-pink-50 text-pink-600 py-1 rounded-lg font-bold mt-3" data-i18n="s5_step5_b">Selesai</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 6: Hak dan Kewajiban -->
-        <div class="slide flex flex-col justify-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-xl border border-white">
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-6 flex items-center gap-3">
-                <span class="p-2 bg-yellow-100 rounded-2xl text-2xl">⚖️</span> <span data-i18n="s6_title">Hak dan Kewajiban</span>
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
-                    <h3 class="font-bold text-gray-800 text-base border-b pb-2 flex items-center gap-2" data-i18n="s6_buyer_title">🛒 Hak & Kewajiban Pembeli</h3>
-                    <div class="text-xs space-y-2">
-                        <p data-i18n="s6_buyer_hak"><strong class="text-pink-600">Hak Pembeli:</strong> Mendapat barang sesuai kesepakatan dan informasi harga yang jelas.</p>
-                        <p data-i18n="s6_buyer_kewajiban"><strong class="text-pink-600">Kewajiban Pembeli:</strong> Membayar sesuai kesepakatan dan menjaga sikap sopan.</p>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
-                    <h3 class="font-bold text-gray-800 text-base border-b pb-2 flex items-center gap-2" data-i18n="s6_seller_title">🧑‍💼 Hak & Kewajiban Penjual</h3>
-                    <div class="text-xs space-y-2">
-                        <p data-i18n="s6_seller_hak"><strong class="text-emerald-600">Hak Penjual:</strong> Menerima pembayaran sesuai kesepakatan.</p>
-                        <p data-i18n="s6_seller_kewajiban"><strong class="text-emerald-600">Kewajiban Penjual:</strong> Memberikan barang sesuai kesepakatan dan menjelaskan kondisi barang dengan jujur.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 7: Video Animasi -->
-        <div class="slide flex flex-col justify-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-xl border border-white">
-            <h2 class="text-3xl font-extrabold text-gray-800 mb-4 flex items-center gap-3">
-                <span class="p-2 bg-rose-100 rounded-2xl text-2xl">🎬</span> <span data-i18n="s7_title">Video Animasi Jual Beli</span>
-            </h2>
-            <p class="text-gray-600 text-xs mb-4" data-i18n="s7_desc">Tonton video animasi berikut agar kamu lebih paham tentang kegiatan jual beli!</p>
-            <div class="w-full flex-1 max-h-[380px] bg-black rounded-2xl overflow-hidden shadow-md flex items-center justify-center">
-                <iframe class="w-full h-full" width="100%" height="100%" src="https://www.youtube.com/embed/XvSXC2TaLCY?enablejsapi=1&si=2ejx84BYCFurlxHB" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-            <div class="mt-2 flex justify-between items-center text-xs text-gray-500">
-                <span data-i18n="s7_hint">💡 Jika video tidak bisa diputar (Error 153), gunakan <b>Live Server</b> (localhost).</span>
-                <a href="https://www.youtube.com/watch?v=XvSXC2TaLCY" target="_blank" rel="noopener noreferrer" class="text-rose-600 font-bold hover:underline flex items-center gap-1" data-i18n="s7_yt_link">
-                    Tonton di YouTube ↗
-                </a>
-            </div>
-        </div>
-
-        <!-- Slide 8: Game Quiz Interaktif -->
-        <div class="slide flex flex-col justify-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-xl border border-white relative overflow-hidden">
-            <div id="coin-container" class="absolute inset-0 pointer-events-none z-20"></div>
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 flex items-center gap-3">
-                    <span class="p-2 bg-amber-100 rounded-2xl text-2xl">🎮</span> <span data-i18n="s8_title">Game: Choose the Right One!</span>
-                </h2>
-                <span id="quiz-progress" class="text-xs font-bold bg-pink-100 text-pink-700 px-3 py-1 rounded-full">Soal 1 dari 5</span>
-            </div>
-            <div id="quiz-box" class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex-1 flex flex-col justify-between">
-                <div>
-                    <p id="quiz-question" class="text-base font-bold text-gray-800 mb-4"></p>
-                    <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-                </div>
-                <div id="quiz-feedback" class="text-xs font-semibold h-6 text-center"></div>
-            </div>
-        </div>
-
-        <!-- Slide 9: Simulasi Belanja & Bayar (Drag & Drop Uang) -->
-        <div class="slide flex flex-col justify-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-xl border border-white overflow-y-auto">
-            <h2 class="text-2xl font-extrabold text-gray-800 mb-2 flex items-center gap-3">
-                <span class="p-2 bg-emerald-100 rounded-2xl text-xl">🛒</span> <span data-i18n="s9_title">Simulasi Belanja & Pembayaran</span>
-            </h2>
-            <p class="text-xs text-gray-600 mb-4" data-i18n="s9_desc">Pilih barang, cek spesifikasinya dengan teliti, lalu bayar dengan menarik uang yang sesuai!</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Item List -->
-                <div class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-sm text-gray-800 mb-2" data-i18n="s9_item_title">Pilih Barang:</h3>
-                        <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1" id="item-list"></div>
-                    </div>
-                </div>
-
-                <!-- Item Specification Check -->
-                <div class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-sm text-gray-800 mb-2" data-i18n="s9_spec_title">Cek Spesifikasi Barang:</h3>
-                        <div id="item-spec" class="text-xs text-gray-600 space-y-1.5 bg-gray-50 p-3 rounded-xl border border-gray-100 min-h-[110px]">
-                            <p class="text-gray-400 italic" data-i18n="s9_spec_placeholder">Silakan pilih salah satu barang di samping untuk memeriksa kualitasnya.</p>
-                        </div>
-                    </div>
-                    <button id="btn-agree" onclick="proceedToPay()" disabled class="mt-3 w-full py-2 bg-gray-200 text-gray-400 font-bold rounded-xl text-xs transition cursor-not-allowed" data-i18n="s9_btn_agree">Setuju & Lanjut Bayar</button>
-                </div>
-
-                <!-- Payment Box -->
-                <div id="payment-panel" class="bg-white p-4 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between transition-colors duration-300">
-                    <div>
-                        <h3 class="font-bold text-sm text-gray-800 mb-1" data-i18n="s9_cashier_title">Kasir Pembayaran:</h3>
-                        <p id="payment-instruction" class="text-[11px] text-gray-500 mb-2" data-i18n="s9_cashier_inst_default">Pilih barang dan setujui dulu untuk membayar.</p>
-                        <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center bg-gray-50 flex flex-col items-center justify-center min-h-[90px] transition">
-                            <span class="text-xs text-gray-400" data-i18n="s9_dropzone_default">Seret uang ke sini untuk membayar</span>
-                        </div>
-                    </div>
-                    <div class="mt-2 flex justify-between items-center text-xs font-bold">
-                        <span class="text-gray-600"><span data-i18n="s9_total_label">Total:</span> <span id="target-price" class="text-pink-600">Rp 0</span></span>
-                        <span id="payment-status" class="text-gray-400" data-i18n="s9_status_unpaid">Belum lunas</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Wallet Money -->
-            <div class="mt-3 bg-white p-3 rounded-2xl shadow-xs border border-gray-100 flex items-center gap-3 overflow-x-auto">
-                <span class="text-xs font-bold text-gray-700 shrink-0" data-i18n="s9_wallet_title">Dompet Uang:</span>
-                <div class="flex gap-2" id="wallet">
-                    <div draggable="true" ondragstart="drag(event)" data-value="7500" class="px-3 py-1.5 bg-amber-100 text-amber-800 rounded-xl text-xs font-bold cursor-grab active:cursor-grabbing border border-amber-200 shadow-xs">Rp 7.500</div>
-                    <div draggable="true" ondragstart="drag(event)" data-value="11000" class="px-3 py-1.5 bg-blue-100 text-blue-800 rounded-xl text-xs font-bold cursor-grab active:cursor-grabbing border border-blue-200 shadow-xs">Rp 11.000</div>
-                    <div draggable="true" ondragstart="drag(event)" data-value="15000" class="px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold cursor-grab active:cursor-grabbing border border-emerald-200 shadow-xs">Rp 15.000</div>
-                    <div draggable="true" ondragstart="drag(event)" data-value="154000" class="px-3 py-1.5 bg-purple-100 text-purple-800 rounded-xl text-xs font-bold cursor-grab active:cursor-grabbing border border-purple-200 shadow-xs">Rp 154.000</div>
-                    <div draggable="true" ondragstart="drag(event)" data-value="200000" class="px-3 py-1.5 bg-rose-100 text-rose-800 rounded-xl text-xs font-bold cursor-grab active:cursor-grabbing border border-rose-200 shadow-xs">Rp 200.000</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 10: Penutup & Credits -->
-        <div class="slide flex flex-col justify-center items-center text-center w-full max-w-5xl h-full bg-white/85 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white overflow-hidden relative">
-            <h2 class="text-4xl font-extrabold text-gray-800 mb-2" data-i18n="s10_title">Terima Kasih! 🎉</h2>
-            <p class="text-sm text-gray-600 mb-6" data-i18n="s10_desc">Semoga pembelajaran ini bermanfaat untuk kita semua.</p>
-            
-            <div class="w-full max-w-xl h-48 bg-gray-50/80 rounded-2xl overflow-hidden relative border border-gray-100 shadow-inner p-4">
-                <div class="credits-scroll absolute w-full left-0 space-y-3 text-xs text-gray-600">
-                    <p class="font-bold text-gray-800 text-sm" data-i18n="s10_team">Dan segenap tim kami</p>
-                    <p data-i18n="s10_powered">Didukung oleh platform & teknologi hebat:</p>
-                    <div class="flex flex-wrap justify-center gap-2 pt-2">
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">GPT</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">Gemini</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">MS Word</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">GitHub</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">Claude</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">Vercel</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">YouTube</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">CapCut</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">Canva</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">Pinterest</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">WhatsApp</span>
-                        <span class="px-3 py-1 bg-white rounded-full shadow-xs border">Telegram</span>
-                    </div>
-                    <p class="pt-6 font-semibold text-gray-400">© 2026 Special Education UNESA</p>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Bottom Slide Controls -->
-    <footer class="flex justify-between items-center px-8 py-3 bg-white/70 backdrop-blur-md shadow-xs z-50 border-t border-white/40">
-        <button onclick="prevSlide()" class="px-5 py-2 text-xs font-bold bg-white text-gray-700 hover:bg-gray-100 rounded-full shadow-xs transition cursor-pointer border border-gray-200 flex items-center gap-1.5">
-            <span>◀</span> <span data-i18n="btn_prev">Sebelumnya</span>
-        </button>
-        <span id="slide-indicator" class="text-xs font-bold text-gray-500">Slide 1 dari 10</span>
-        <button onclick="nextSlide()" class="px-5 py-2 text-xs font-bold bg-pink-500 text-white hover:bg-pink-600 rounded-full shadow-md transition cursor-pointer flex items-center gap-1.5">
-            <span data-i18n="btn_next">Selanjutnya</span> <span>▶</span>
-        </button>
-    </footer>
-
-    <!-- Pop Up Modal -->
-    <div id="modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-gray-100 transform scale-95 transition-all">
-            <h3 id="modal-title" class="font-extrabold text-gray-800 text-lg mb-2"></h3>
-            <p id="modal-desc" class="text-xs text-gray-600 mb-6 leading-relaxed"></p>
-            <button onclick="closePopup()" class="w-full py-2.5 bg-pink-500 text-white font-bold rounded-xl text-xs hover:bg-pink-600 transition cursor-pointer" data-i18n="modal_close">Tutup</button>
-        </div>
+<!-- 3 Pengertian -->
+<section class="slide edged" aria-labelledby="t3">
+  <h2 id="t3" tabindex="-1"><span class="em" aria-hidden="true">💡</span><span data-i18n="s3_title">Apa itu Jual Beli?</span></h2>
+  <div class="lead-row">
+    <p class="lead" data-i18n="s3_desc"></p>
+    <div class="deco" aria-hidden="true">
+      <span class="obj" data-o="apple" style="--s:56px" title="Barang"></span>
+      <i class="swap-ar" title="Tukar"></i>
+      <span class="obj" data-o="cash" style="--s:56px" title="Uang"></span>
     </div>
+  </div>
+  <p class="label" data-i18n="s3_req_title"></p>
+  <div class="grid" id="tiles">
+    <button class="tile" type="button" data-k="seller" onclick="openPopupKey('seller')"><b class="em" aria-hidden="true">🧑‍💼</b><span data-i18n="s3_card1_title">1. Penjual</span><small data-i18n="s3_card1_sub"></small></button>
+    <button class="tile" type="button" data-k="goods" onclick="openPopupKey('goods')"><b class="em" aria-hidden="true">🧸</b><span data-i18n="s3_card2_title">2. Barang</span><small data-i18n="s3_card2_sub"></small></button>
+    <button class="tile" type="button" data-k="payment_tool" onclick="openPopupKey('payment_tool')"><b class="em" aria-hidden="true">💵</b><span data-i18n="s3_card3_title">3. Alat Transaksi</span><small data-i18n="s3_card3_sub"></small></button>
+    <button class="tile" type="button" data-k="buyer" onclick="openPopupKey('buyer')"><b class="em" aria-hidden="true">🛒</b><span data-i18n="s3_card4_title">4. Pembeli</span><small data-i18n="s3_card4_sub"></small></button>
+  </div>
+  <div id="detail" class="panel detail" aria-live="polite" hidden></div>
+</section>
 
-    <!-- Slide Overview Modal -->
-    <div id="overview-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-gray-100">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-extrabold text-gray-800 text-base" data-i18n="overview_title">📑 Pilih Slide</h3>
-                <button onclick="closeOverview()" class="text-gray-400 hover:text-gray-600 font-bold text-sm">✕</button>
-            </div>
-            <div class="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1" id="overview-grid"></div>
-        </div>
+<!-- 4 Peran -->
+<section class="slide edged" aria-labelledby="t4">
+  <h2 id="t4" tabindex="-1"><span class="em" aria-hidden="true">🤝</span><span data-i18n="s4_title">Peran Penjual dan Pembeli</span></h2>
+  <div class="grid wide">
+    <div class="panel"><h3>🧑‍🍳 <span data-i18n="s4_seller_title">Peran Penjual</span></h3>
+      <ul class="chk"><li data-i18n="s4_seller_1"></li><li data-i18n="s4_seller_2"></li><li data-i18n="s4_seller_3"></li></ul>
+      <div class="deco shelf compact" data-opt aria-hidden="true">
+        <span class="obj" data-o="apple" style="--s:48px" title="Barang Dagangan"></span>
+        <span class="obj" data-o="carrot" style="--s:48px" title="Sayur Dagangan"></span>
+        <span class="obj" data-o="bottle" style="--s:48px" title="Minuman Dagangan"></span>
+      </div>
     </div>
+    <div class="panel"><h3>🛍️ <span data-i18n="s4_buyer_title">Peran Pembeli</span></h3>
+      <ul class="chk"><li data-i18n="s4_buyer_1"></li><li data-i18n="s4_buyer_2"></li><li data-i18n="s4_buyer_3"></li></ul>
+      <div class="deco shelf compact" data-opt aria-hidden="true">
+        <span class="obj" data-o="bag" style="--s:50px" title="Tas Belanja"></span>
+        <span class="obj" data-o="cash" style="--s:50px" title="Uang Bayar"></span>
+        <span class="obj" data-o="coin" style="--s:44px" title="Uang Koin"></span>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <script src="main.js"></script>
+<!-- 5 Alur -->
+<section class="slide edged" aria-labelledby="t5">
+  <h2 id="t5" tabindex="-1"><span class="em" aria-hidden="true">⚡</span><span data-i18n="s5_title">Alur Langkah Jual Beli</span></h2>
+  <ol class="steps">
+    <li><b class="em" aria-hidden="true">🔍</b><h3 data-i18n="s5_step1_h"></h3><p data-i18n="s5_step1_p"></p><span class="chip" data-i18n="s5_step1_b"></span></li>
+    <li><b class="em" aria-hidden="true">🏷️</b><h3 data-i18n="s5_step2_h"></h3><p data-i18n="s5_step2_p"></p><span class="chip" data-i18n="s5_step2_b"></span></li>
+    <li><b class="em" aria-hidden="true">🤝</b><h3 data-i18n="s5_step3_h"></h3><p data-i18n="s5_step3_p"></p><span class="chip" data-i18n="s5_step3_b"></span></li>
+    <li><b class="em" aria-hidden="true">💳</b><h3 data-i18n="s5_step4_h"></h3><p data-i18n="s5_step4_p"></p><span class="chip" data-i18n="s5_step4_b"></span></li>
+    <li><b class="em" aria-hidden="true">✅</b><h3 data-i18n="s5_step5_h"></h3><p data-i18n="s5_step5_p"></p><span class="chip" data-i18n="s5_step5_b"></span></li>
+  </ol>
+  <!-- Ban berjalan kasir visual interaktif -->
+  <div class="belt" data-opt aria-hidden="true">
+    <div class="belt-track">
+      <span class="obj" data-o="apple" style="--s:52px"></span>
+      <span class="obj" data-o="orange" style="--s:48px"></span>
+      <span class="obj" data-o="carrot" style="--s:50px"></span>
+      <span class="obj" data-o="bottle" style="--s:50px"></span>
+      <span class="obj" data-o="bag" style="--s:54px"></span>
+      <span class="obj" data-o="cash" style="--s:52px"></span>
+      <span class="obj" data-o="melon" style="--s:54px"></span>
+      <span class="obj" data-o="apple" style="--s:52px"></span>
+      <span class="obj" data-o="orange" style="--s:48px"></span>
+      <span class="obj" data-o="carrot" style="--s:50px"></span>
+      <span class="obj" data-o="bottle" style="--s:50px"></span>
+      <span class="obj" data-o="bag" style="--s:54px"></span>
+      <span class="obj" data-o="cash" style="--s:52px"></span>
+      <span class="obj" data-o="melon" style="--s:54px"></span>
+    </div>
+  </div>
+</section>
+
+<!-- 6 Hak -->
+<section class="slide edged" aria-labelledby="t6">
+  <h2 id="t6" tabindex="-1"><span class="em" aria-hidden="true">⚖️</span><span data-i18n="s6_title">Hak dan Kewajiban</span></h2>
+  <div class="grid wide">
+    <div class="panel"><h3 data-i18n="s6_buyer_title"></h3><p data-i18n="s6_buyer_hak"></p><p data-i18n="s6_buyer_kewajiban"></p></div>
+    <div class="panel"><h3 data-i18n="s6_seller_title"></h3><p data-i18n="s6_seller_hak"></p><p data-i18n="s6_seller_kewajiban"></p></div>
+  </div>
+  <!-- Visual timbangan 3D keseimbangan nilai barang dan uang -->
+  <div class="scale" data-opt aria-label="Keseimbangan Nilai Barang dan Uang">
+    <div class="sc-base"></div>
+    <div class="sc-post"></div>
+    <div class="sc-beam">
+      <div class="sc-pan l">
+        <div class="sc-items"><span class="obj" data-o="apple" style="--s:42px" title="Apel"></span><span class="obj" data-o="melon" style="--s:42px" title="Semangka"></span></div>
+        <div class="sc-dish"></div>
+        <b data-i18n="s6_scale_goods">Barang Seimbang</b>
+      </div>
+      <div class="sc-pan r">
+        <div class="sc-items"><span class="obj" data-o="cash" style="--s:44px" title="Uang Kertas"></span><span class="obj" data-o="coin" style="--s:38px" title="Koin"></span></div>
+        <div class="sc-dish"></div>
+        <b data-i18n="s6_scale_money">Nilai Uang Pas</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 Video -->
+<section class="slide edged" aria-labelledby="t7">
+  <h2 id="t7" tabindex="-1"><span class="em" aria-hidden="true">🎬</span><span data-i18n="s7_title">Video Animasi Jual Beli</span></h2>
+  <p data-i18n="s7_desc"></p>
+  <div class="video"><iframe src="https://www.youtube.com/embed/XvSXC2TaLCY?enablejsapi=1&cc_load_policy=1&cc_lang_pref=id&hl=id&rel=0" title="Video animasi jual beli" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+  <p class="row between small"><span>💬 <span data-i18n="cc_note">Subtitle (CC) dinyalakan otomatis.</span></span>
+    <a href="https://www.youtube.com/watch?v=XvSXC2TaLCY" target="_blank" rel="noopener noreferrer" data-i18n="s7_yt_link">Tonton di YouTube ↗</a></p>
+</section>
+
+<!-- 8 Kuis (Halaman penuh - tidak ditambah elemen berlebih) -->
+<section class="slide" aria-labelledby="t8">
+  <div id="coin-container" class="coins" aria-hidden="true"></div>
+  <div class="row between">
+    <h2 id="t8" tabindex="-1"><span class="em" aria-hidden="true">🎮</span><span data-i18n="s8_title">Game: Choose the Right One!</span></h2>
+    <span id="quiz-progress" class="chip"></span>
+  </div>
+  <div class="meter"><i id="quiz-bar"></i></div>
+  <div id="quiz-box" class="panel quiz">
+    <div class="q"><span id="mascot" class="mascot" aria-hidden="true">🙂</span><p id="quiz-question"></p></div>
+    <div id="quiz-options" class="grid wide"></div>
+    <p id="quiz-feedback" class="fb" role="status" aria-live="assertive"></p>
+  </div>
+  <div id="quiz-end" class="panel end" hidden></div>
+</section>
+
+<!-- 9 Simulasi (Halaman penuh - fungsional & interaktif) -->
+<section class="slide" aria-labelledby="t9">
+  <div id="coins-9" class="coins" aria-hidden="true"></div>
+  <h2 id="t9" tabindex="-1"><span class="em" aria-hidden="true">🛒</span><span data-i18n="s9_title">Simulasi Belanja & Pembayaran</span></h2>
+  <ol class="stepper" id="stepper"><li><span>1</span><b data-i18n="st_pick">Pilih</b></li><li><span>2</span><b data-i18n="st_check">Periksa</b></li><li><span>3</span><b data-i18n="st_pay">Bayar</b></li></ol>
+  <div class="grid shop">
+    <div class="panel"><h3 data-i18n="s9_item_title">Pilih Barang:</h3><div class="items" id="item-list"></div></div>
+    <div class="panel"><h3 data-i18n="s9_spec_title">Cek Spesifikasi Barang:</h3>
+      <div id="item-spec" class="spec"><p class="muted" data-i18n="s9_spec_placeholder"></p></div>
+      <button id="btn-agree" class="btn" type="button" onclick="proceedToPay()" disabled data-i18n="s9_btn_agree">Setuju & Lanjut Bayar</button></div>
+    <div class="panel" id="payment-panel"><h3 data-i18n="s9_cashier_title">Kasir Pembayaran:</h3>
+      <p id="payment-instruction" class="small" data-i18n="s9_cashier_inst_default"></p>
+      <div id="drop-zone" class="drop" aria-live="polite"><span data-i18n="s9_dropzone_default">Seret uang ke sini untuk membayar</span></div>
+      <p class="row between"><span><span data-i18n="s9_total_label">Total:</span> <b id="target-price">Rp 0</b></span><b id="payment-status" data-i18n="s9_status_unpaid">Belum lunas</b></p>
+      <button id="btn-again" class="btn" type="button" onclick="resetShop()" hidden data-i18n="buy_again">Belanja lagi</button></div>
+  </div>
+  <div class="panel wallet-box"><b data-i18n="s9_wallet_title">Dompet Uang:</b><div id="wallet" class="wallet"></div></div>
+</section>
+
+<!-- 10 Penutup -->
+<section class="slide end-slide edged" aria-labelledby="t10">
+  <h2 id="t10" tabindex="-1" data-i18n="s10_title">Terima Kasih! 🎉</h2>
+  <p data-i18n="s10_desc"></p>
+  <!-- Rak visual hadiah apresiasi interaktif -->
+  <div class="deco shelf" data-opt aria-label="Hadiah Pembelajaran">
+    <span class="obj" data-o="gift" style="--s:68px" title="Kado"></span>
+    <span class="obj" data-o="apple" style="--s:64px" title="Apel"></span>
+    <span class="obj" data-o="strawberry" style="--s:62px" title="Stroberi"></span>
+    <span class="obj" data-o="bag" style="--s:68px" title="Tas"></span>
+    <span class="obj" data-o="coin" style="--s:58px" title="Koin Emas"></span>
+  </div>
+  <p class="small">© 2026 Special Education UNESA</p>
+  <button class="btn" type="button" onclick="go(0)">↺ <span data-i18n="btn_restart">Ulangi dari awal</span></button>
+</section>
+</main>
+
+<footer>
+  <button class="btn ghost nav" id="prev" type="button" onclick="prevSlide()" aria-label="Sebelumnya">◀ <span class="hide-sm" data-i18n="btn_prev">Sebelumnya</span></button>
+  <div class="mid"><nav id="dots" class="dots" aria-label="Slide"></nav><span id="slide-indicator" class="small"></span></div>
+  <button class="btn nav" id="next" type="button" onclick="nextSlide()" aria-label="Selanjutnya"><span class="hide-sm" data-i18n="btn_next">Selanjutnya</span> ▶</button>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
+<script src="main.js"></script>
+<script src="objects.js"></script>
+<script src="fx.js"></script>
 </body>
 </html>

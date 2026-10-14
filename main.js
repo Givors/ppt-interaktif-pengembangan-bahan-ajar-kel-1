@@ -82,6 +82,8 @@ const translations = {
         s6_seller_title: "🧑‍💼 Hak & Kewajiban Penjual",
         s6_seller_hak: '<strong class="text-emerald-600">Hak Penjual:</strong> Menerima pembayaran sesuai kesepakatan.',
         s6_seller_kewajiban: '<strong class="text-emerald-600">Kewajiban Penjual:</strong> Memberikan barang sesuai kesepakatan dan menjelaskan kondisi barang dengan jujur.',
+        s6_scale_goods: "Barang Seimbang",
+        s6_scale_money: "Nilai Uang Pas",
 
         // Slide 7: Video Animasi
         s7_title: "Video Animasi Jual Beli",
@@ -112,7 +114,6 @@ const translations = {
         s10_title: "Terima Kasih! 🎉",
         s10_desc: "Semoga pembelajaran ini bermanfaat untuk kita semua.",
         s10_team: "Dan segenap tim kami",
-        s10_powered: "Didukung oleh platform & teknologi hebat:",
 
         // Footer & Controls
         btn_prev: "Sebelumnya",
@@ -210,6 +211,8 @@ const translations = {
         s6_seller_title: "🧑‍💼 Seller Rights & Obligations",
         s6_seller_hak: '<strong class="text-emerald-600">Seller Rights:</strong> Receive payment according to agreement.',
         s6_seller_kewajiban: '<strong class="text-emerald-600">Seller Obligations:</strong> Deliver items as agreed and describe item conditions honestly.',
+        s6_scale_goods: "Fair Goods",
+        s6_scale_money: "Exact Money",
 
         // Slide 7: Video Animasi
         s7_title: "Buying & Selling Animated Video",
@@ -240,7 +243,6 @@ const translations = {
         s10_title: "Thank You! 🎉",
         s10_desc: "We hope this interactive learning media is helpful for everyone.",
         s10_team: "And our entire development team",
-        s10_powered: "Powered by great platforms & technologies:",
 
         // Footer & Controls
         btn_prev: "Previous",
@@ -374,19 +376,6 @@ const items = [
 let selectedItemIndex = null;
 let currentQuiz = 0;
 
-function showToast(msg) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.innerText = msg;
-    toast.classList.remove('opacity-0', '-translate-y-2');
-    toast.classList.add('opacity-100', 'translate-y-0');
-    if (toastTimeout) clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => {
-        toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', '-translate-y-2');
-    }, 2000);
-}
-
 function toggleLang() {
     currentLang = currentLang === 'id' ? 'en' : 'id';
     applyLanguage(currentLang);
@@ -420,246 +409,240 @@ function applyLanguage(lang) {
     } else {
         const specBox = document.getElementById('item-spec');
         if (specBox && t) {
-            specBox.innerHTML = `<p class="text-gray-400 italic">${t.s9_spec_placeholder}</p>`;
+            specBox.innerHTML = `<p class="muted">${t.s9_spec_placeholder}</p>`;
         }
     }
 }
 
+// ===== Teks tambahan (ID/EN) =====
+Object.assign(translations.id, {
+    tools_label: "Tampilan", btn_start: "Mulai Belajar", btn_restart: "Ulangi dari awal",
+    cc_note: "Subtitle (CC) dinyalakan otomatis.",
+    st_pick: "Pilih", st_check: "Periksa", st_pay: "Bayar", buy_again: "Belanja lagi",
+    quiz_done_title: "Selesai! 🎉", quiz_score: "Skor kamu", quiz_again: "Main lagi",
+    pay_more: "Uangnya terlalu banyak", pay_less: "Uangnya kurang", pay_wallet_hint: "Pilih barang dan setujui dulu."
+});
+Object.assign(translations.en, {
+    tools_label: "Display", btn_start: "Start Learning", btn_restart: "Start over",
+    cc_note: "Captions (CC) turn on automatically.",
+    st_pick: "Choose", st_check: "Check", st_pay: "Pay", buy_again: "Shop again",
+    quiz_done_title: "All done! 🎉", quiz_score: "Your score", quiz_again: "Play again",
+    pay_more: "Too much money", pay_less: "Not enough money", pay_wallet_hint: "Choose an item and agree first."
+});
+
+// ===== Helper =====
+const $ = id => document.getElementById(id);
+const T = () => translations[currentLang];
+const money = n => 'Rp ' + n.toLocaleString('id-ID');
+const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };      // getar = umpan balik non-suara
+const save = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+const load = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const ITEM_EMOJI = ['🥬', '🧸', '🥤', '👕', '🍎'];
+const THEMES = { red: '#fda4af', orange: '#fcd34d', yellow: '#fef08a', green: '#6ee7b7', blue: '#7dd3fc', purple: '#c4b5fd', pink: '#f9a8d4' };
+const POP_EMOJI = { seller: '🧑‍💼', goods: '🧸', payment_tool: '💵', buyer: '🛒' };
+
+function showToast(msg) {
+    const t = $('toast'); t.innerText = msg; t.classList.add('show');
+    clearTimeout(toastTimeout); toastTimeout = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function rain(list = ['🪙', '⭐', '🎉'], id = 'coin-container') {
+    const box = $(id); if (!box) return;
+    for (let i = 0; i < 20; i++) {
+        const c = document.createElement('span');
+        c.className = 'coin'; c.innerText = list[i % list.length];
+        c.style.left = Math.random() * 92 + '%'; c.style.animationDelay = Math.random() * .5 + 's';
+        box.appendChild(c); setTimeout(() => c.remove(), 2400);
+    }
+}
+function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+
+// ===== Navigasi =====
 function updateSlide() {
-    slides.forEach((slide, index) => {
-        slide.classList.toggle('active', index === currentSlide);
+    slides.forEach((s, i) => { s.classList.toggle('active', i === currentSlide); s.inert = i !== currentSlide; });
+    const yt = document.querySelector('iframe');
+    if (yt && currentSlide !== 6) yt.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+    const t = T();
+    $('slide-indicator').innerText = `${t.slide_word} ${currentSlide + 1} ${t.of_word} ${totalSlides}`;
+    $('bar').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+    $('prev').disabled = currentSlide === 0; $('next').disabled = currentSlide === totalSlides - 1;
+    document.querySelectorAll('#dots button').forEach((b, i) => {
+        b.setAttribute('aria-current', i === currentSlide);
+        b.setAttribute('aria-label', `${t.slide_word} ${i + 1}: ${slides[i].querySelector('h2')?.innerText || ''}`);
     });
-
-    // Pause video jika berpindah dari slide video (Slide 7 / index 6)
-    const ytIframe = document.querySelector('iframe');
-    if (ytIframe && currentSlide !== 6) {
-        ytIframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-    }
-
-    const indicator = document.getElementById('slide-indicator');
-    if (indicator) {
-        const t = translations[currentLang];
-        indicator.innerText = `${t.slide_word} ${currentSlide + 1} ${t.of_word} ${totalSlides}`;
-    }
 }
-
-function nextSlide() {
-    if (currentSlide < totalSlides - 1) {
-        currentSlide++;
-        updateSlide();
-    }
-}
-
-function prevSlide() {
-    if (currentSlide > 0) {
-        currentSlide--;
-        updateSlide();
-    }
-}
-
-function goToSlide(index) {
-    currentSlide = index;
+function go(i) {
+    currentSlide = Math.max(0, Math.min(totalSlides - 1, i));
     updateSlide();
-    closeOverview();
+    const s = slides[currentSlide]; s.scrollTop = 0;
+    s.querySelector('h2')?.focus({ preventScroll: true });
+    if (currentSlide === 7 && currentQuiz >= quizData.length) resetQuiz();
+}
+function nextSlide() { go(currentSlide + 1); }
+function prevSlide() { go(currentSlide - 1); }
+function goToSlide(i) { go(i); }
+
+// ===== Tampilan: tema & ukuran huruf =====
+function setTheme(c) {
+    document.body.className = `theme-${c}`; save('theme', c);
+    document.querySelectorAll('.sw').forEach(b => b.setAttribute('aria-pressed', b.dataset.theme === c));
+}
+function cycleText() {
+    const h = document.documentElement, n = h.classList.contains('t3') ? 1 : h.classList.contains('t2') ? 3 : 2;
+    h.classList.remove('t2', 't3'); if (n > 1) h.classList.add('t' + n); save('text', n);
 }
 
-function setTheme(color) {
-    document.body.className = `theme-${color} flex flex-col h-screen overflow-hidden font-['Quicksand'] select-none`;
-}
-
-// Pop Up Modal
+// ===== Slide 3: kartu detail (tanpa pop-up) =====
 function openPopupKey(key) {
-    if (!popupData[key]) return;
-    const data = popupData[key][currentLang];
-    document.getElementById('modal-title').innerText = data.title;
-    document.getElementById('modal-desc').innerText = data.desc;
-    document.getElementById('modal').classList.remove('hidden');
+    const d = popupData[key]?.[currentLang]; if (!d) return;
+    const box = $('detail');
+    box.innerHTML = `<div class="row"><b class="em" aria-hidden="true">${POP_EMOJI[key]}</b><h3></h3></div><p></p>`;
+    box.querySelector('h3').innerText = d.title; box.querySelector('p').innerText = d.desc;
+    box.hidden = false; box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';
+    document.querySelector(`.tile[data-k="${key}"]`).classList.add('seen');
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (document.querySelectorAll('.tile.seen').length === 4) { buzz(40); }
 }
 
-function openPopup(title, desc) {
-    document.getElementById('modal-title').innerText = title;
-    document.getElementById('modal-desc').innerText = desc;
-    document.getElementById('modal').classList.remove('hidden');
-}
-
-function closePopup() {
-    document.getElementById('modal').classList.add('hidden');
-}
-
-// Slide Overview Modal
-function openOverview() {
-    const grid = document.getElementById('overview-grid');
-    grid.innerHTML = '';
-    const t = translations[currentLang];
-    slides.forEach((_, index) => {
-        const btn = document.createElement('button');
-        btn.className = `p-3 rounded-2xl text-xs font-bold text-left transition border ${index === currentSlide ? 'bg-pink-500 text-white border-pink-500 shadow-sm' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-gray-200'}`;
-        btn.innerText = `${t.slide_word} ${index + 1}`;
-        btn.onclick = () => goToExerciseSlide(index);
-        grid.appendChild(btn);
-    });
-    document.getElementById('overview-modal').classList.remove('hidden');
-}
-
-function goToExerciseSlide(index) {
-    goToSlide(index);
-}
-
-function closeOverview() {
-    document.getElementById('overview-modal').classList.add('hidden');
-}
-
-// Quiz Logic (Slide 8)
+// ===== Slide 8: kuis =====
+let score = 0, tries = 0, locked = false;
 function loadQuiz() {
-    if (currentQuiz >= quizData.length) currentQuiz = 0;
-    const data = quizData[currentQuiz];
-    const qLang = data[currentLang] || data.id;
-    const t = translations[currentLang];
-
-    const progressEl = document.getElementById('quiz-progress');
-    if (progressEl) {
-        progressEl.innerText = `${t.s8_progress_prefix} ${currentQuiz + 1} ${t.s8_progress_mid} ${quizData.length}`;
-    }
-
-    const questionEl = document.getElementById('quiz-question');
-    if (questionEl) {
-        questionEl.innerText = qLang.q;
-    }
-
-    const feedbackEl = document.getElementById('quiz-feedback');
-    if (feedbackEl) {
-        feedbackEl.innerText = '';
-    }
-    
-    const optionsBox = document.getElementById('quiz-options');
-    if (!optionsBox) return;
-    optionsBox.innerHTML = '';
-    
-    qLang.options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = "p-3 rounded-2xl bg-gray-50 hover:bg-pink-50 hover:text-pink-600 font-bold text-xs text-gray-700 border border-gray-200 transition text-left cursor-pointer";
-        btn.innerText = `${String.fromCharCode(65 + idx)}. ${opt}`;
-        btn.onclick = () => checkQuiz(idx, data.correct);
-        optionsBox.appendChild(btn);
+    if (currentQuiz >= quizData.length) return showEnd();
+    $('quiz-box').hidden = false; $('quiz-end').hidden = true;
+    const d = quizData[currentQuiz], q = d[currentLang] || d.id, t = T();
+    $('quiz-progress').innerText = `${t.s8_progress_prefix} ${currentQuiz + 1} ${t.s8_progress_mid} ${quizData.length}`;
+    $('quiz-bar').style.width = (currentQuiz / quizData.length * 100) + '%';
+    $('quiz-question').innerText = q.q; $('quiz-feedback').innerText = ''; $('quiz-feedback').className = 'fb';
+    $('mascot').innerText = '🙂'; locked = false;
+    const box = $('quiz-options'); box.innerHTML = '';
+    q.options.forEach((o, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt'; b.innerHTML = `<i>${'ABCD'[i]}</i><span></span>`; b.lastChild.innerText = o;
+        b.onclick = () => checkQuiz(i, d.correct, b); box.appendChild(b);
     });
 }
-
-function checkQuiz(selected, correct) {
-    const feedback = document.getElementById('quiz-feedback');
-    const t = translations[currentLang];
-    if (selected === correct) {
-        feedback.className = "text-xs font-bold h-6 text-center text-emerald-600";
-        feedback.innerText = t.quiz_correct;
-        triggerCoinRain();
-        setTimeout(() => {
-            currentQuiz++;
-            loadQuiz();
-        }, 1500);
+function checkQuiz(i, correct, btn) {
+    if (locked || btn.disabled) return;
+    const fb = $('quiz-feedback'), t = T();
+    if (i === correct) {
+        locked = true; btn.classList.add('ok'); fb.className = 'fb ok'; fb.innerText = t.quiz_correct;
+        $('mascot').innerText = '🥳'; if (tries === 0) score++; tries = 0;
+        rain(); buzz(40); currentQuiz++;
+        setTimeout(loadQuiz, 1500);
     } else {
-        feedback.className = "text-xs font-bold h-6 text-center text-rose-500";
-        feedback.innerText = t.quiz_wrong;
+        btn.classList.add('bad'); btn.disabled = true; tries++;
+        fb.className = 'fb bad'; fb.innerText = t.quiz_wrong; $('mascot').innerText = '🤔';
+        shake($('quiz-box')); buzz([80, 40, 80]);
     }
 }
-
-function triggerCoinRain() {
-    const container = document.getElementById('coin-container');
-    if (!container) return;
-    for (let i = 0; i < 15; i++) {
-        const coin = document.createElement('div');
-        coin.className = 'coin';
-        coin.innerText = '🪙';
-        coin.style.left = Math.random() * 90 + '%';
-        coin.style.animationDelay = Math.random() * 0.5 + 's';
-        container.appendChild(coin);
-        setTimeout(() => coin.remove(), 1500);
-    }
+function showEnd() {
+    const t = T(), n = quizData.length, stars = score >= n ? 3 : score >= n - 2 ? 2 : 1;
+    $('quiz-bar').style.width = '100%'; $('quiz-box').hidden = true;
+    const end = $('quiz-end'); end.hidden = false;
+    end.innerHTML = `<div class="big" aria-hidden="true">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div><h3>${t.quiz_done_title}</h3><p>${t.quiz_score}: <b>${score}/${n}</b></p><button class="btn" onclick="resetQuiz()">↺ ${t.quiz_again}</button>`;
+    if (currentSlide === 7) { rain(['⭐', '🎉', '🪙']); buzz([40, 30, 40, 30, 80]); }
 }
+function resetQuiz() { currentQuiz = 0; score = 0; tries = 0; loadQuiz(); }
 
-// Shopping Simulation (Slide 9)
+// ===== Slide 9: simulasi belanja =====
+let agreed = false;
+function setStep(n) {
+    document.querySelectorAll('#stepper li').forEach((li, i) => { li.classList.toggle('on', i === n - 1); li.classList.toggle('done', i < n - 1); });
+}
 function loadItems() {
-    const list = document.getElementById('item-list');
-    if (!list) return;
-    list.innerHTML = '';
-    items.forEach((item, idx) => {
-        const itemData = item[currentLang] || item.id;
-        const isSelected = selectedItemIndex === idx;
-        const div = document.createElement('div');
-        div.className = `p-2.5 rounded-xl ${isSelected ? 'bg-pink-100 border-pink-300' : 'bg-gray-50 hover:bg-pink-50 border-gray-200'} border cursor-pointer text-xs font-bold text-gray-700 flex justify-between items-center transition`;
-        div.innerHTML = `<span>🛍️ ${itemData.name}</span><span class="text-pink-600">Rp ${item.price.toLocaleString('id-ID')}</span>`;
-        div.onclick = () => selectItem(idx);
-        list.appendChild(div);
+    const list = $('item-list'); list.innerHTML = '';
+    items.forEach((it, i) => {
+        const d = it[currentLang] || it.id, b = document.createElement('button');
+        b.className = 'item' + (i === selectedItemIndex ? ' sel' : ''); b.setAttribute('aria-pressed', i === selectedItemIndex);
+        b.innerHTML = `<b class="em" aria-hidden="true">${ITEM_EMOJI[i]}</b><span>${d.name}</span><em>${money(it.price)}</em>`;
+        b.onclick = () => selectItem(i); list.appendChild(b);
     });
 }
-
-function selectItem(idx) {
-    selectedItemIndex = idx;
-    const item = items[idx];
-    const itemData = item[currentLang] || item.id;
-    const t = translations[currentLang];
-    
-    const specBox = document.getElementById('item-spec');
-    if (specBox) {
-        specBox.innerHTML = `<p class="font-bold text-gray-800 mb-1">${t.spec_prefix} ${itemData.name}:</p>` + 
-            itemData.specs.map(s => `<p>${s}</p>`).join('');
-    }
-    
-    const btnAgree = document.getElementById('btn-agree');
-    if (btnAgree) {
-        btnAgree.disabled = false;
-        btnAgree.className = "mt-3 w-full py-2 bg-pink-500 text-white font-bold rounded-xl text-xs hover:bg-pink-600 transition cursor-pointer";
-        btnAgree.innerText = t.s9_btn_agree;
-    }
-
-    loadItems(); // Refresh styling highlight pada list item
+function selectItem(i) {
+    if (i !== selectedItemIndex) { agreed = false; clearPay(); }
+    selectedItemIndex = i;
+    const d = items[i][currentLang] || items[i].id, t = T();
+    $('item-spec').innerHTML = `<p><b>${t.spec_prefix} ${d.name}:</b></p>` + d.specs.map(s => `<p>${s}</p>`).join('');
+    const b = $('btn-agree'); b.disabled = false; b.innerText = t.s9_btn_agree;
+    setStep(agreed ? 3 : 2); loadItems(); renderWallet();
 }
-
 function proceedToPay() {
     if (selectedItemIndex === null) return;
-    const item = items[selectedItemIndex];
-    const t = translations[currentLang];
-
-    document.getElementById('target-price').innerText = `Rp ${item.price.toLocaleString('id-ID')}`;
-    document.getElementById('payment-instruction').innerText = `${t.drag_instruction_prefix} Rp ${item.price.toLocaleString('id-ID')} ${t.drag_instruction_suffix}`;
-    
-    const dropZone = document.getElementById('drop-zone');
-    dropZone.innerHTML = `<span class="text-xs text-gray-600 font-bold">${t.s9_dropzone_default} (Target: Rp ${item.price.toLocaleString('id-ID')})</span>`;
-    
-    document.getElementById('payment-panel').className = "bg-white p-4 rounded-2xl shadow-xs border border-gray-100 flex flex-col justify-between transition-colors duration-300";
-    document.getElementById('payment-status').innerText = t.s9_status_unpaid;
-    document.getElementById('payment-status').className = "text-gray-400";
+    const p = items[selectedItemIndex].price, t = T(); agreed = true;
+    $('target-price').innerText = money(p);
+    $('payment-instruction').innerText = `${t.drag_instruction_prefix} ${money(p)} ${t.drag_instruction_suffix}`;
+    setStep(3); renderWallet(); $('wallet').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
-
-function drag(ev) {
-    ev.dataTransfer.setData("text", ev.target.getAttribute('data-value'));
-}
-
-const dropZone = document.getElementById('drop-zone');
-if (dropZone) {
-    dropZone.addEventListener('dragover', (ev) => ev.preventDefault());
-    dropZone.addEventListener('drop', (ev) => {
-        ev.preventDefault();
-        if (selectedItemIndex === null) return;
-        const currentItem = items[selectedItemIndex];
-        const val = parseInt(ev.dataTransfer.getData("text"));
-        const panel = document.getElementById('payment-panel');
-        const status = document.getElementById('payment-status');
-        const t = translations[currentLang];
-        
-        if (val === currentItem.price) {
-            panel.className = "bg-emerald-50 p-4 rounded-2xl shadow-xs border border-emerald-300 flex flex-col justify-between transition-colors duration-300";
-            dropZone.innerHTML = `<span class="text-xs text-emerald-700 font-bold">${t.pay_success}</span>`;
-            status.innerText = t.pay_status_success;
-            status.className = "text-emerald-600 font-bold";
-        } else {
-            panel.className = "bg-rose-50 p-4 rounded-2xl shadow-xs border border-rose-300 flex flex-col justify-between transition-colors duration-300";
-            dropZone.innerHTML = `<span class="text-xs text-rose-700 font-bold">${t.pay_fail_prefix} (Rp ${val.toLocaleString('id-ID')})</span>`;
-            status.innerText = t.pay_status_fail;
-            status.className = "text-rose-600 font-bold";
-        }
+function renderWallet() {
+    const w = $('wallet'); w.innerHTML = '';
+    [7500, 11000, 15000, 154000, 200000].forEach((v, k) => {
+        const b = document.createElement('button');
+        b.className = 'bill b' + k; b.innerText = '💵 ' + money(v); b.disabled = !agreed;
+        b.draggable = true; b.dataset.value = v;
+        b.ondragstart = drag; b.onclick = () => pay(v); w.appendChild(b);
     });
 }
+function clearPay() {
+    const t = T();
+    $('payment-panel').className = 'panel'; $('target-price').innerText = 'Rp 0';
+    $('payment-instruction').innerText = t.s9_cashier_inst_default;
+    $('drop-zone').innerHTML = `<span>${t.s9_dropzone_default}</span>`;
+    const s = $('payment-status'); s.innerText = t.s9_status_unpaid; s.style.color = ''; $('btn-again').hidden = true;
+}
+function resetShop() {
+    selectedItemIndex = null; agreed = false; clearPay(); setStep(1); loadItems(); renderWallet();
+    $('item-spec').innerHTML = `<p class="muted">${T().s9_spec_placeholder}</p>`;
+    const b = $('btn-agree'); b.disabled = true; b.innerText = T().s9_btn_agree;
+}
+function pay(val) {
+    const t = T(); if (!agreed) return showToast(t.pay_wallet_hint);
+    const price = items[selectedItemIndex].price, panel = $('payment-panel'), s = $('payment-status'), z = $('drop-zone');
+    if (val === price) {
+        panel.className = 'panel ok'; z.innerHTML = `<b>${t.pay_success}</b>`;
+        s.innerText = t.pay_status_success; s.style.color = '#047857'; $('btn-again').hidden = false;
+        document.querySelectorAll('.bill').forEach(b => b.disabled = true);
+        rain(['🎉', '🪙', '🛍️'], 'coins-9'); buzz([40, 30, 40, 30, 80]);
+    } else {
+        panel.className = 'panel bad';
+        z.innerHTML = `<b>${val > price ? '⬆️ ' + t.pay_more : '⬇️ ' + t.pay_less}</b><span>${money(val)} → ${money(price)}</span>`;
+        s.innerText = t.pay_status_fail; s.style.color = '#be123c'; shake(panel); buzz([80, 40, 80]);
+    }
+}
+function drag(ev) { ev.dataTransfer.setData('text', ev.target.dataset.value); }
 
-// Inisialisasi awal aman saat dokumen siap
-document.addEventListener("DOMContentLoaded", () => {
-    applyLanguage('id');
+// ===== Inisialisasi =====
+window.setTheme = setTheme;
+window.cycleText = cycleText;
+window.toggleLang = toggleLang;
+window.nextSlide = nextSlide;
+window.prevSlide = prevSlide;
+window.goToSlide = goToSlide;
+window.go = go;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const swBox = $('swatches');
+    if (swBox) {
+        swBox.innerHTML = Object.entries(THEMES).map(([k, c]) => `<button class="sw" type="button" style="--c:${c}" data-theme="${k}" aria-label="Tema ${k}"></button>`).join('');
+        swBox.addEventListener('click', e => {
+            const sw = e.target.closest('.sw');
+            if (sw && sw.dataset.theme) setTheme(sw.dataset.theme);
+        });
+    }
+    $('dots').innerHTML = [...slides].map((_, i) => `<button type="button" onclick="go(${i})"></button>`).join('');
+    setTheme(load('theme') || 'pink');
+    const n = +load('text'); if (n > 1) document.documentElement.classList.add('t' + n);
+    const z = $('drop-zone');
+    z.addEventListener('dragover', e => { e.preventDefault(); z.classList.add('over'); });
+    z.addEventListener('dragleave', () => z.classList.remove('over'));
+    z.addEventListener('drop', e => { e.preventDefault(); z.classList.remove('over'); pay(parseInt(e.dataTransfer.getData('text'))); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight') nextSlide(); else if (e.key === 'ArrowLeft') prevSlide();
+    });
+    let x0 = 0, y0 = 0; const main = document.querySelector('main');
+    main.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+    main.addEventListener('touchend', e => {
+        if (e.target.closest('#wallet, iframe')) return;
+        const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+        if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8) dx < 0 ? nextSlide() : prevSlide();
+    }, { passive: true });
+    applyLanguage('id'); setStep(1); renderWallet();
 });
